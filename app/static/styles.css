@@ -334,6 +334,72 @@ textarea { min-height: 92px; }
 }
 .appointment-card span, .appointment-card em { color: var(--muted); font-style: normal; font-size: 14px; }
 .inline-form { display: flex; gap: 8px; align-items: center; }
+.month-calendar {
+  overflow-x: auto;
+}
+.month-weekdays,
+.month-row {
+  min-width: 980px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(130px, 1fr));
+}
+.month-weekdays strong {
+  padding: 10px;
+  background: #e2ead4;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.month-cell {
+  min-height: 132px;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 9px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  background: #fbfbf7;
+}
+.month-cell:hover {
+  outline: 3px solid #7db4b9;
+  outline-offset: -3px;
+}
+.month-cell.muted-month {
+  background: #f0f2f4;
+  color: #7a8490;
+}
+.month-cell.holiday {
+  background: #fff7ed;
+}
+.month-cell.over-capacity {
+  border: 2px solid #d97706;
+  background: #fffbeb;
+}
+.month-day {
+  font-size: 22px;
+  font-weight: 900;
+}
+.month-cell em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 14px;
+}
+.month-badge {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.danger-badge {
+  color: #8a1f11;
+  background: #fde2dc;
+}
+.warning-badge {
+  color: #7c3e00;
+  background: #fdecc8;
+}
+.muted { color: var(--muted); }
 .login-page {
   min-height: 100vh;
   display: grid;

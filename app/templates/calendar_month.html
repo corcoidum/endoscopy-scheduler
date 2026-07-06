@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title">
+  <div>
+    <h1>월간 예약 현황</h1>
+    <p>{{ month_start.strftime("%Y년 %m월") }}</p>
+  </div>
+  <form method="get" class="inline-form">
+    <a class="button secondary" href="/calendar/month?month={{ previous_month.strftime('%Y-%m') }}">이전 달</a>
+    <input type="month" name="month" value="{{ month_start.strftime('%Y-%m') }}">
+    <button class="button" type="submit">조회</button>
+    <a class="button secondary" href="/calendar/month?month={{ next_month.strftime('%Y-%m') }}">다음 달</a>
+  </form>
+</section>
+
+<section class="month-calendar panel">
+  <div class="month-weekdays">
+    {% for label in weekday_labels %}
+      <strong>{{ label }}</strong>
+    {% endfor %}
+  </div>
+  {% for week in month_cells %}
+    <div class="month-row">
+      {% for cell in week %}
+        <a class="month-cell {{ '' if cell.is_current_month else 'muted-month' }} {{ 'holiday' if cell.holiday else '' }} {{ 'over-capacity' if cell.is_over_capacity else '' }}"
+           href="/calendar/day?day={{ cell.day.isoformat() }}">
+          <span class="month-day">{{ cell.day.day }}</span>
+          {% if cell.holiday %}
+            <span class="month-badge danger-badge">{{ cell.holiday.description or "휴일" }}</span>
+          {% endif %}
+          {% if cell.total %}
+            <strong>{{ cell.total }}건</strong>
+            <span>위 {{ cell.stomach }} · 대장 {{ cell.colon }}</span>
+          {% else %}
+            <span class="muted">예약 없음</span>
+          {% endif %}
+          {% if cell.capacity_total %}
+            <em>정원 {{ cell.capacity_total }}</em>
+          {% endif %}
+          {% if cell.is_over_capacity %}
+            <span class="month-badge warning-badge">정원 초과</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

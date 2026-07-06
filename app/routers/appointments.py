@@ -1,3 +1,4 @@
+from calendar import Calendar
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
@@ -592,6 +593,88 @@ def week_calendar(
     write_audit_log(db, request=request, user=user, action="view_week", target_type="appointment", target_id=None)
     db.commit()
     return templates.TemplateResponse("calendar_week.html", template_context(request, user, grouped=grouped, rows=rows, week_start=week_start, week_end=week_end))
+
+
+@router.get("/calendar/month", response_class=HTMLResponse)
+def month_calendar(
+    request: Request,
+    month: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> HTMLResponse:
+    today = date.today()
+    try:
+        month_start = date.fromisoformat(f"{month}-01") if month else today.replace(day=1)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="month는 YYYY-MM 형식이어야 합니다.")
+
+    weeks = Calendar(firstweekday=0).monthdatescalendar(month_start.year, month_start.month)
+    period_start = weeks[0][0]
+    period_end = weeks[-1][-1]
+    appointments = db.scalars(
+        select(EndoscopyAppointment)
+        .options(joinedload(EndoscopyAppointment.patient))
+        .where(and_(EndoscopyAppointment.appointment_date >= period_start, EndoscopyAppointment.appointment_date <= period_end))
+        .order_by(EndoscopyAppointment.appointment_date, EndoscopyAppointment.appointment_time)
+    ).all()
+    holidays = {
+        item.holiday_date: item
+        for item in db.scalars(
+            select(Holiday).where(and_(Holiday.holiday_date >= period_start, Holiday.holiday_date <= period_end))
+        ).all()
+    }
+    capacities = db.scalars(select(ScheduleCapacity).where(ScheduleCapacity.is_active.is_(True))).all()
+    daily_capacity = {
+        weekday: sum(item.max_capacity for item in capacities if item.weekday == weekday)
+        for weekday in range(7)
+    }
+    grouped: dict[date, list[EndoscopyAppointment]] = {day: [] for week in weeks for day in week}
+    for appointment in appointments:
+        grouped.setdefault(appointment.appointment_date, []).append(appointment)
+
+    month_cells = []
+    for week in weeks:
+        row = []
+        for day in week:
+            items = grouped.get(day, [])
+            active_items = [item for item in items if item.status in ACTIVE_STATUSES]
+            capacity_total = daily_capacity.get(day.weekday(), 0)
+            stomach_count = sum(
+                1 for item in active_items if item.endoscopy_type in [EndoscopyType.gastroscopy.value, EndoscopyType.both.value]
+            )
+            colon_count = sum(
+                1 for item in active_items if item.endoscopy_type in [EndoscopyType.colonoscopy.value, EndoscopyType.both.value]
+            )
+            row.append(
+                {
+                    "day": day,
+                    "is_current_month": day.month == month_start.month,
+                    "appointments": active_items,
+                    "total": len(active_items),
+                    "stomach": stomach_count,
+                    "colon": colon_count,
+                    "holiday": holidays.get(day),
+                    "capacity_total": capacity_total,
+                    "is_over_capacity": capacity_total > 0 and len(active_items) > capacity_total,
+                }
+            )
+        month_cells.append(row)
+
+    previous_month = (month_start.replace(day=1) - timedelta(days=1)).replace(day=1)
+    next_month = (month_start.replace(day=28) + timedelta(days=4)).replace(day=1)
+    write_audit_log(db, request=request, user=user, action="view_month", target_type="appointment", target_id=None)
+    db.commit()
+    return templates.TemplateResponse(
+        "calendar_month.html",
+        template_context(
+            request,
+            user,
+            month_start=month_start,
+            previous_month=previous_month,
+            next_month=next_month,
+            month_cells=month_cells,
+        ),
+    )
 
 
 @router.get("/search", response_class=HTMLResponse)
