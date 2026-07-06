@@ -44,6 +44,17 @@ a { color: inherit; }
 .page-title { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 18px; }
 h1 { font-size: 30px; margin: 0; }
 h2 { font-size: 22px; margin: 0 0 12px; }
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.section-heading span {
+  color: var(--muted);
+  font-size: 15px;
+}
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -103,6 +114,22 @@ h2 { font-size: 22px; margin: 0 0 12px; }
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px 9px;
+  font-weight: 800;
+}
+.prep-label {
+  background: #f8fafc;
+}
+.mini-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.mini-flags span:not(.muted) {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #fff3cd;
+  color: #6b3d00;
+  font-size: 13px;
   font-weight: 800;
 }
 tr.status-취소, tr.status-노쇼 { color: #6b7280; background: #f3f4f6; }

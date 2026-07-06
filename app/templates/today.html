@@ -15,10 +15,16 @@
   <div><strong>{{ counts.both }}</strong><span>동시</span></div>
   <div><strong>{{ counts.ultrasound }}</strong><span>초음파</span></div>
   <div><strong>{{ counts.not_prepared }}</strong><span>준비 미확인</span></div>
+  <div><strong>{{ counts.medication_check }}</strong><span>약제 확인</span></div>
+  <div><strong>{{ counts.guardian_notice }}</strong><span>보호자 안내</span></div>
   <div><strong>{{ counts.completed }}</strong><span>완료</span></div>
 </section>
 
 <section class="panel">
+  <div class="section-heading">
+    <h2>오늘 검사 목록</h2>
+    <span>시간순 · 준비상태 · 장정결제 확인</span>
+  </div>
   <table class="data-table">
     <thead>
       <tr>
@@ -28,6 +34,8 @@
         <th>검사</th>
         <th>수면</th>
         <th>준비</th>
+        <th>장정결제</th>
+        <th>확인 필요</th>
         <th>상태</th>
         <th>작업</th>
       </tr>
@@ -40,7 +48,15 @@
         <td>{{ item.patient.chart_number }}</td>
         <td>{{ exam_summary(item) }}</td>
         <td>{{ "예" if item.sedation else "아니오" }}</td>
-        <td>{{ item.preparation_status }}</td>
+        <td><span class="status-label prep-label">{{ item.preparation_status }}</span></td>
+        <td>{{ item.bowel_prep_type or "-" }}</td>
+        <td>
+          <div class="mini-flags">
+            {% if item.medication_check_required %}<span>약제</span>{% endif %}
+            {% if item.guardian_notice %}<span>보호자</span>{% endif %}
+            {% if not item.medication_check_required and not item.guardian_notice %}<span class="muted">-</span>{% endif %}
+          </div>
+        </td>
         <td><span class="status-label">{{ item.status }}</span></td>
         <td class="actions">
           <a class="button small" href="/appointments/{{ item.id }}">상세</a>
@@ -52,7 +68,7 @@
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="8" class="empty">오늘 예약이 없습니다.</td></tr>
+      <tr><td colspan="10" class="empty">오늘 예약이 없습니다.</td></tr>
       {% endfor %}
     </tbody>
   </table>

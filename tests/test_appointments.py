@@ -128,3 +128,38 @@ def test_month_calendar_shows_counts_holiday_and_capacity_warning(client, db_ses
     assert "임시 휴일" in response.text
     assert "정원 초과" in response.text
     assert "/calendar/day?day=2026-07-06" in response.text
+
+
+def test_today_dashboard_shows_preparation_bowel_prep_and_status_action(client):
+    login(client, "staff")
+    assert create_appointment(
+        client,
+        chart_number="C20260021",
+        patient_name="오늘가상B",
+        appointment_time="09:30",
+        endoscopy_type="대장내시경",
+        preparation_status="미안내",
+        bowel_prep_type="수클리어산",
+        medication_check_required="on",
+        guardian_notice="on",
+    ).status_code == 303
+    assert create_appointment(
+        client,
+        chart_number="C20260020",
+        patient_name="오늘가상A",
+        appointment_time="09:00",
+        endoscopy_type="위내시경",
+        preparation_status="안내 완료",
+    ).status_code == 303
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.text.index("09:00") < response.text.index("09:30")
+    assert "오늘 검사 목록" in response.text
+    assert "대장내시경" in response.text
+    assert "미안내" in response.text
+    assert "수클리어산" in response.text
+    assert "약제" in response.text
+    assert "보호자" in response.text
+    assert "advance-status" in response.text

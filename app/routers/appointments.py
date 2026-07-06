@@ -216,6 +216,8 @@ def today(
         "both": sum(1 for item in appointments if item.endoscopy_type == EndoscopyType.both.value),
         "ultrasound": sum(1 for item in appointments if ultrasound_labels(item)),
         "not_prepared": sum(1 for item in appointments if item.preparation_status == PreparationStatus.not_done.value),
+        "medication_check": sum(1 for item in appointments if item.medication_check_required),
+        "guardian_notice": sum(1 for item in appointments if item.guardian_notice),
         "cancelled_or_no_show": sum(1 for item in appointments if item.status in [AppointmentStatus.cancelled.value, AppointmentStatus.no_show.value]),
         "completed": sum(1 for item in appointments if item.status == AppointmentStatus.completed.value),
     }
