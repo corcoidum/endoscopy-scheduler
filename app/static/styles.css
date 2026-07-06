@@ -182,6 +182,26 @@ tr.status-확인\ 필요 .status-label { color: var(--warning); border-color: #e
   gap: 14px;
 }
 .form-stack { display: grid; gap: 14px; }
+.appointment-flow {
+  gap: 12px;
+}
+.flow-section {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 0;
+}
+.flow-section summary {
+  cursor: pointer;
+  padding: 13px 14px;
+  font-weight: 900;
+}
+.flow-section[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+.flow-section .form-grid {
+  padding: 14px;
+}
 label { display: grid; gap: 6px; font-weight: 700; }
 label.check { display: inline-flex; gap: 8px; align-items: center; padding-top: 28px; }
 label.check.compact {

@@ -10,72 +10,89 @@
   </div>
 {% endif %}
 
-<form method="post" action="{{ '/appointments/' ~ appointment.id ~ '/edit' if appointment else '/appointments' }}" class="panel form-grid">
+<form method="post" action="{{ '/appointments/' ~ appointment.id ~ '/edit' if appointment else '/appointments' }}" class="panel form-stack appointment-flow">
   {% if appointment %}<input type="hidden" name="version" value="{{ appointment.version }}">{% endif %}
-  <label>검사 예정일
-    <input type="date" name="appointment_date" value="{{ appointment.appointment_date if appointment else selected_date }}" required>
-  </label>
-  <label>예약 시간
-    <input type="time" name="appointment_time" value="{{ appointment.appointment_time.strftime('%H:%M') if appointment else (selected_time or '09:00') }}" required>
-  </label>
-  <label>차트번호
-    <input name="chart_number" value="{{ appointment.patient.chart_number if appointment else '' }}" required>
-  </label>
-  <label>환자 이름
-    <input name="patient_name" value="{{ appointment.patient.patient_name if appointment else '' }}" required>
-  </label>
-  <label>성별
-    <select name="sex" required>
-      {% set sex_value = appointment.patient.sex if appointment else "여" %}
-      <option value="여" {{ "selected" if sex_value == "여" else "" }}>여</option>
-      <option value="남" {{ "selected" if sex_value == "남" else "" }}>남</option>
-    </select>
-  </label>
-  <label>나이
-    <input name="age" type="number" min="0" max="120" value="{{ appointment.patient.age if appointment and appointment.patient.age else '' }}">
-  </label>
-  <label>연락처 뒤 4자리
-    <input name="phone_last4" maxlength="4" inputmode="numeric" value="{{ appointment.patient.phone_last4 if appointment and appointment.patient.phone_last4 else '' }}">
-  </label>
-  <label>내시경 종류
-    {% set selected_endoscopy = appointment.endoscopy_type if appointment else "위내시경" %}
-    <select name="endoscopy_type" required>
-      {% for endoscopy in endoscopy_types %}
-        <option value="{{ endoscopy.value }}" {{ "selected" if selected_endoscopy == endoscopy.value else "" }}>{{ endoscopy.value }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <fieldset class="wide checkbox-panel">
-    <legend>초음파 시행 여부</legend>
-    {% for field, label in ultrasound_options %}
-      <label class="check compact">
-        <input type="checkbox" name="{{ field }}" {{ "checked" if appointment and (appointment|attr(field)) else "" }}> {{ label }}
+  <details class="flow-section" open>
+    <summary>필수 정보</summary>
+    <div class="form-grid">
+      <label>검사 예정일
+        <input type="date" name="appointment_date" value="{{ appointment.appointment_date if appointment else selected_date }}" required>
       </label>
-    {% endfor %}
-  </fieldset>
-  <label class="check"><input type="checkbox" name="sedation" {{ "checked" if appointment and appointment.sedation else "" }}> 수면</label>
-  <label>준비 안내
-    <select name="preparation_status">
-      {% for prep in preparations %}
-        <option value="{{ prep.value }}" {{ "selected" if appointment and appointment.preparation_status == prep.value else "" }}>{{ prep.value }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label class="check"><input type="checkbox" name="medication_check_required" {{ "checked" if appointment and appointment.medication_check_required else "" }}> 항응고제/항혈소판제 확인 필요</label>
-  <label>대장정결약
-    <select name="bowel_prep_type">
-      {% for prep in bowel_preps %}
-        <option value="{{ prep.value }}" {{ "selected" if appointment and appointment.bowel_prep_type == prep.value else "" }}>{{ prep.value or "해당 없음" }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label class="check"><input type="checkbox" name="guardian_notice" {{ "checked" if appointment and appointment.guardian_notice else "" }}> 보호자 동반 안내</label>
-  <label>관리자 예외 사유
-    <input name="override_reason" value="{{ appointment.override_reason if appointment and appointment.override_reason else '' }}" placeholder="정원 초과 등 예외 시 관리자만 입력">
-  </label>
-  <label class="wide">특이사항
-    <textarea name="notes" rows="3">{{ appointment.notes if appointment and appointment.notes else '' }}</textarea>
-  </label>
+      <label>예약 시간
+        <input type="time" name="appointment_time" value="{{ appointment.appointment_time.strftime('%H:%M') if appointment else (selected_time or '09:00') }}" required>
+      </label>
+      <label>차트번호
+        <input name="chart_number" value="{{ appointment.patient.chart_number if appointment else '' }}" required>
+      </label>
+      <label>환자 이름
+        <input name="patient_name" value="{{ appointment.patient.patient_name if appointment else '' }}" required>
+      </label>
+      <label>성별
+        <select name="sex" required>
+          {% set sex_value = appointment.patient.sex if appointment else "여" %}
+          <option value="여" {{ "selected" if sex_value == "여" else "" }}>여</option>
+          <option value="남" {{ "selected" if sex_value == "남" else "" }}>남</option>
+        </select>
+      </label>
+      <label>내시경 종류
+        {% set selected_endoscopy = appointment.endoscopy_type if appointment else "위내시경" %}
+        <select name="endoscopy_type" required>
+          {% for endoscopy in endoscopy_types %}
+            <option value="{{ endoscopy.value }}" {{ "selected" if selected_endoscopy == endoscopy.value else "" }}>{{ endoscopy.value }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </details>
+
+  <details class="flow-section">
+    <summary>선택 정보</summary>
+    <div class="form-grid">
+      <label>나이
+        <input name="age" type="number" min="0" max="120" value="{{ appointment.patient.age if appointment and appointment.patient.age else '' }}">
+      </label>
+      <label>연락처 뒤 4자리
+        <input name="phone_last4" maxlength="4" inputmode="numeric" value="{{ appointment.patient.phone_last4 if appointment and appointment.patient.phone_last4 else '' }}">
+      </label>
+      <fieldset class="wide checkbox-panel">
+        <legend>초음파 시행 여부</legend>
+        {% for field, label in ultrasound_options %}
+          <label class="check compact">
+            <input type="checkbox" name="{{ field }}" {{ "checked" if appointment and (appointment|attr(field)) else "" }}> {{ label }}
+          </label>
+        {% endfor %}
+      </fieldset>
+      <label class="check"><input type="checkbox" name="sedation" {{ "checked" if appointment and appointment.sedation else "" }}> 수면</label>
+    </div>
+  </details>
+
+  <details class="flow-section">
+    <summary>준비/안전 확인</summary>
+    <div class="form-grid">
+      <label>준비 안내
+        <select name="preparation_status">
+          {% for prep in preparations %}
+            <option value="{{ prep.value }}" {{ "selected" if appointment and appointment.preparation_status == prep.value else "" }}>{{ prep.value }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>대장정결약
+        <select name="bowel_prep_type">
+          {% for prep in bowel_preps %}
+            <option value="{{ prep.value }}" {{ "selected" if appointment and appointment.bowel_prep_type == prep.value else "" }}>{{ prep.value or "해당 없음" }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" name="medication_check_required" {{ "checked" if appointment and appointment.medication_check_required else "" }}> 항응고제/항혈소판제 확인 필요</label>
+      <label class="check"><input type="checkbox" name="guardian_notice" {{ "checked" if appointment and appointment.guardian_notice else "" }}> 보호자 동반 안내</label>
+      <label>관리자 예외 사유
+        <input name="override_reason" value="{{ appointment.override_reason if appointment and appointment.override_reason else '' }}" placeholder="정원 초과 등 예외 시 관리자만 입력">
+      </label>
+      <label class="wide">특이사항
+        <textarea name="notes" rows="3">{{ appointment.notes if appointment and appointment.notes else '' }}</textarea>
+      </label>
+    </div>
+  </details>
   <div class="wide form-actions">
     <button class="button primary" type="submit">저장</button>
     <a class="button secondary" href="/">취소</a>

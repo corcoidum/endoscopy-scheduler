@@ -206,3 +206,27 @@ def test_today_dashboard_risk_panel_groups_missing_items(client, db_session):
     assert "준비위험" in response.text
     assert "약제위험" in response.text
     assert "노쇼위험" in response.text
+
+
+def test_appointment_form_groups_required_and_optional_inputs(client):
+    login(client, "staff")
+
+    response = client.get("/appointments/new")
+
+    assert response.status_code == 200
+    assert "필수 정보" in response.text
+    assert "선택 정보" in response.text
+    assert "준비/안전 확인" in response.text
+    assert response.text.index("필수 정보") < response.text.index("선택 정보") < response.text.index("준비/안전 확인")
+
+
+def test_cancel_flow_requires_reason_and_confirmation(client):
+    login(client, "staff")
+    assert create_appointment(client).status_code == 303
+
+    response = client.get("/appointments/1")
+
+    assert response.status_code == 200
+    assert 'name="cancellation_reason" required' in response.text
+    assert "confirm(" in response.text
+    assert "취소 사유 입력 후 버튼을 누르면" in response.text

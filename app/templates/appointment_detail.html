@@ -25,6 +25,7 @@
 {% if appointment.status != "취소" %}
 <section class="panel narrow danger-zone">
   <h2>예약 취소</h2>
+  <p class="muted">취소 사유 입력 후 버튼을 누르면 마지막 확인 창이 열립니다.</p>
   <form method="post" action="/appointments/{{ appointment.id }}/cancel" onsubmit="return confirm('{{ appointment.patient.patient_name }} / {{ appointment.patient.chart_number }} 예약을 취소할까요?')">
     <input type="hidden" name="version" value="{{ appointment.version }}">
     <label>취소 사유 <input name="cancellation_reason" required></label>
