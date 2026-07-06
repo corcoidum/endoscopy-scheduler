@@ -269,3 +269,48 @@ README의 테스트 명령도 그대로 실행했다.
 5. P2 등록 폼 온보딩: 섹션화와 실수 방지 메시지 개선
 
 이 순서가 좋은 이유는 먼저 앱이 “문서대로 켜지고 테스트되는 상태”를 만든 뒤, 실제 직원이 매일 보는 첫 화면부터 개선할 수 있기 때문이다.
+
+## 6. Sprint 1 구현 확인 기록
+
+확인일: 2026-07-06
+
+이번 구현 범위:
+
+- [x] `/calendar/month` 월간 캘린더 추가
+  - 날짜 셀 클릭 시 `/calendar/day?day=YYYY-MM-DD`로 이동
+  - 예약 건수, 위/대장 요약, 휴일, 정원 초과 표시
+- [x] 오늘 대시보드 강화
+  - 오늘 검사 목록에 검사 종류, 준비상태, 장정결제, 약제/보호자 확인 표시
+  - 상태 변경은 기존 `advance-status` 흐름 재사용
+- [x] 누락 리스크 패널 추가
+  - D-3 이내 준비 안내 미발송
+  - 약제 확인 필요 플래그
+  - 노쇼 후 미조치 건
+  - 각 항목은 예약 상세로 이동
+- [x] 입력/수정/취소 흐름 단순화
+  - 예약 폼을 `필수 정보`, `선택 정보`, `준비/안전 확인` 접힘 구역으로 재배치
+  - 취소 사유 입력 유지
+  - 취소 버튼 제출 시 확인 창 유지
+
+검증 결과:
+
+- [x] `python .\scripts\bootstrap_admin.py`
+  - 결과: `bootstrap complete`
+- [x] `.\\.venv\\Scripts\\pytest.exe -q --tb=short`
+  - 결과: `18 passed, 1 skipped`
+- [x] uvicorn 수동 확인
+  - 실행: `.\\.venv\\Scripts\\uvicorn.exe app.main:app --host 127.0.0.1 --port 8000`
+  - 로그인 POST `/login`: 303
+  - GET `/`: 200, `누락 리스크`, `오늘 검사 목록` 확인
+  - GET `/calendar/month`: 200, `월간 예약 현황` 확인
+  - GET `/calendar/day`: 200
+  - GET `/calendar/week`: 200
+  - GET `/appointments/new`: 200, `필수 정보`, `준비/안전 확인` 확인
+
+구현 커밋:
+
+- `3d744aa chore: stabilize local pytest runtime`
+- `214b2bc feat: add monthly calendar overview`
+- `9d6873c feat: improve today dashboard details`
+- `d44ec25 feat: surface appointment risk panel`
+- `bf306b8 feat: simplify appointment form and cancel flow`
