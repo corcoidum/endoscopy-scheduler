@@ -1,0 +1,32 @@
+<section class="panel">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>날짜</th>
+        <th>시간</th>
+        <th>환자</th>
+        <th>차트번호</th>
+        <th>검사</th>
+        <th>상태</th>
+        <th>준비</th>
+        <th>상세</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in appointments %}
+      <tr>
+        <td>{{ item.appointment_date }}</td>
+        <td>{{ item.appointment_time.strftime("%H:%M") }}</td>
+        <td>{{ item.patient.patient_name }}</td>
+        <td>{{ item.patient.chart_number }}</td>
+        <td>{{ exam_summary(item) }}</td>
+        <td>{{ item.status }}</td>
+        <td>{{ item.preparation_status }}</td>
+        <td><a class="button small" href="/appointments/{{ item.id }}">보기</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty">예약이 없습니다.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title"><h1>환자 예약 검색</h1></section>
+<form method="get" class="panel form-grid">
+  <label>환자 이름 <input name="q"></label>
+  <label>차트번호 <input name="chart_number"></label>
+  <label>검사 날짜 <input type="date" name="appointment_date"></label>
+  <label>내시경 종류
+    <select name="endoscopy_type">
+      <option value="">전체</option>
+      {% for endoscopy in endoscopy_types %}<option value="{{ endoscopy.value }}">{{ endoscopy.value }}</option>{% endfor %}
+    </select>
+  </label>
+  <label class="check"><input type="checkbox" name="ultrasound_only" value="true"> 초음파 시행 포함</label>
+  <label>상태
+    <select name="status_value">
+      <option value="">전체</option>
+      {% for status in statuses %}<option value="{{ status.value }}">{{ status.value }}</option>{% endfor %}
+    </select>
+  </label>
+  <label class="check"><input type="checkbox" name="include_cancelled" value="true" checked> 취소/노쇼 포함</label>
+  <div class="wide"><button class="button primary" type="submit">검색</button></div>
+</form>
+{% include "partials_appointment_table.html" %}
+{% endblock %}

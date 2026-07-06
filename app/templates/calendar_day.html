@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "macros_schedule.html" as schedule %}
+{% block content %}
+<section class="page-title">
+  <h1>일간 예약 등록표</h1>
+  <form method="get" class="inline-form">
+    <input type="date" name="day" value="{{ day }}">
+    <button class="button" type="submit">조회</button>
+  </form>
+</section>
+<section class="paper-day">
+  <div class="paper-day-header">
+    <strong>{{ day.strftime("%Y-%m-%d") }}</strong>
+    <span>{{ weekday_labels[day.weekday()] }}요일</span>
+    <a class="button primary" href="/appointments/new?selected_date={{ day }}">예약 등록</a>
+  </div>
+  <div class="paper-day-slots">
+    {% for row in rows %}
+      {{ schedule.paper_slot(row[0], day, loop.index, exam_summary, ultrasound_labels) }}
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

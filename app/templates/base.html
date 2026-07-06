@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "내시경 예약 관리" }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">내시경 예약</a>
+    {% if current_user %}
+      <nav class="nav">
+        <a href="/">오늘</a>
+        <a href="/calendar/day">일간</a>
+        <a href="/calendar/week">주간</a>
+        <a href="/appointments/new">예약 등록</a>
+        <a href="/search">검색</a>
+        {% if current_user.role == "admin" %}
+          <a href="/admin/users">직원</a>
+          <a href="/admin/capacity">정원</a>
+          <a href="/admin/audit-logs">감사</a>
+          <a href="/admin/backups">백업</a>
+          <a href="/admin/privacy-retention">보유기간</a>
+        {% endif %}
+      </nav>
+      <form method="post" action="/logout">
+        <button class="button secondary" type="submit">로그아웃</button>
+      </form>
+    {% endif %}
+  </header>
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

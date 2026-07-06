@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title">
+  <h1>예약 상세</h1>
+  <div class="actions">
+    <a class="button" href="/appointments/{{ appointment.id }}/edit">수정</a>
+    <a class="button secondary" href="/">오늘</a>
+  </div>
+</section>
+
+<section class="panel detail-grid">
+  <div><span>일시</span><strong>{{ appointment.appointment_date }} {{ appointment.appointment_time.strftime("%H:%M") }}</strong></div>
+  <div><span>환자</span><strong>{{ appointment.patient.patient_name }} / {{ appointment.patient.chart_number }}</strong></div>
+  <div><span>성별/나이</span><strong>{{ appointment.patient.sex }} / {{ appointment.patient.age or "-" }}</strong></div>
+  <div><span>내시경</span><strong>{{ appointment.endoscopy_type }}</strong></div>
+  <div><span>초음파</span><strong>{{ ultrasound_labels(appointment)|join(", ") if ultrasound_labels(appointment) else "없음" }}</strong></div>
+  <div><span>검사 요약</span><strong>{{ exam_summary(appointment) }}</strong></div>
+  <div><span>수면</span><strong>{{ "예" if appointment.sedation else "아니오" }}</strong></div>
+  <div><span>준비</span><strong>{{ appointment.preparation_status }}</strong></div>
+  <div><span>상태</span><strong>{{ appointment.status }}</strong></div>
+  <div><span>버전</span><strong>{{ appointment.version }}</strong></div>
+  <div class="wide"><span>특이사항</span><p>{{ appointment.notes or "-" }}</p></div>
+</section>
+
+{% if appointment.status != "취소" %}
+<section class="panel narrow danger-zone">
+  <h2>예약 취소</h2>
+  <form method="post" action="/appointments/{{ appointment.id }}/cancel" onsubmit="return confirm('{{ appointment.patient.patient_name }} / {{ appointment.patient.chart_number }} 예약을 취소할까요?')">
+    <input type="hidden" name="version" value="{{ appointment.version }}">
+    <label>취소 사유 <input name="cancellation_reason" required></label>
+    <button class="button danger" type="submit">취소 처리</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

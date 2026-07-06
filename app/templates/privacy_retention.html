@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title"><h1>개인정보 보유기간 및 비식별화 관리</h1></section>
+<form method="post" class="panel form-grid">
+  <label>검사 완료 후 보유일수
+    <input type="number" name="completed_retention_days" min="1" value="{{ policy.completed_retention_days }}" required>
+  </label>
+  <label class="check"><input type="checkbox" name="anonymize_name" {{ "checked" if policy.anonymize_name else "" }}> 이름 비식별화</label>
+  <label class="check"><input type="checkbox" name="anonymize_phone_last4" {{ "checked" if policy.anonymize_phone_last4 else "" }}> 연락처 뒤 4자리 삭제</label>
+  <div class="wide">
+    <button class="button primary" type="submit">정책 저장</button>
+  </div>
+</form>
+<section class="panel readable">
+  <p>실제 파기 실행은 운영 정책 확정 후 별도 배치 작업으로 연결합니다. 파기 전 관리자 확인과 감사 로그 기록이 필요합니다.</p>
+</section>
+{% endblock %}
+

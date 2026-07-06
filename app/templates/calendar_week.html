@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "macros_schedule.html" as schedule %}
+{% block content %}
+<section class="page-title">
+  <h1>주간 예약 등록표</h1>
+  <p>{{ week_start }} ~ {{ week_end }}</p>
+</section>
+<section class="paper-week">
+  <div class="paper-week-head">
+    {% for day, items in grouped.items() %}
+      <div>
+        <strong>{{ day.day }}</strong>
+        <span>{{ weekday_labels[day.weekday()] }}요일</span>
+        <a href="/appointments/new?selected_date={{ day }}">등록</a>
+      </div>
+    {% endfor %}
+  </div>
+  {% for row in rows %}
+    {% set slot_no = loop.index %}
+    <div class="paper-week-row">
+      {% for day, items in grouped.items() %}
+        {{ schedule.paper_slot(row[loop.index0], day, slot_no, exam_summary, ultrasound_labels) }}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

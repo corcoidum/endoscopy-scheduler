@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title">
+  <div>
+    <h1>오늘의 내시경 일정</h1>
+    <p>{{ today.isoformat() }}</p>
+  </div>
+  <a class="button primary" href="/appointments/new">예약 등록</a>
+</section>
+
+<section class="summary-grid">
+  <div><strong>{{ counts.total }}</strong><span>전체</span></div>
+  <div><strong>{{ counts.gastroscopy }}</strong><span>위</span></div>
+  <div><strong>{{ counts.colonoscopy }}</strong><span>대장</span></div>
+  <div><strong>{{ counts.both }}</strong><span>동시</span></div>
+  <div><strong>{{ counts.ultrasound }}</strong><span>초음파</span></div>
+  <div><strong>{{ counts.not_prepared }}</strong><span>준비 미확인</span></div>
+  <div><strong>{{ counts.completed }}</strong><span>완료</span></div>
+</section>
+
+<section class="panel">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>시간</th>
+        <th>환자</th>
+        <th>차트번호</th>
+        <th>검사</th>
+        <th>수면</th>
+        <th>준비</th>
+        <th>상태</th>
+        <th>작업</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in appointments %}
+      <tr class="status-{{ item.status }}">
+        <td>{{ item.appointment_time.strftime("%H:%M") }}</td>
+        <td>{{ item.patient.patient_name }}</td>
+        <td>{{ item.patient.chart_number }}</td>
+        <td>{{ exam_summary(item) }}</td>
+        <td>{{ "예" if item.sedation else "아니오" }}</td>
+        <td>{{ item.preparation_status }}</td>
+        <td><span class="status-label">{{ item.status }}</span></td>
+        <td class="actions">
+          <a class="button small" href="/appointments/{{ item.id }}">상세</a>
+          {% if item.status in ["예약", "내원", "검사 진행"] %}
+          <form method="post" action="/appointments/{{ item.id }}/advance-status" onsubmit="return confirm('{{ item.patient.patient_name }} / {{ item.patient.chart_number }} 상태를 변경할까요?')">
+            <button class="button small primary" type="submit">다음 상태</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty">오늘 예약이 없습니다.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

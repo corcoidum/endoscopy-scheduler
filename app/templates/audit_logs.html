@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-title"><h1>감사 로그</h1></section>
+<section class="panel">
+  <table class="data-table">
+    <thead><tr><th>일시</th><th>사용자</th><th>작업</th><th>대상</th><th>결과</th><th>IP</th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.created_at }}</td>
+        <td>{{ log.user_id or "-" }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.target_type }} #{{ log.target_id or "-" }}</td>
+        <td>{{ log.result }}</td>
+        <td>{{ log.ip_address or "-" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+

@@ -1,0 +1,42 @@
+{% macro paper_slot(item, slot_date=None, slot_index=0, exam_summary=None, ultrasound_labels=None) %}
+  {% if item %}
+    <a class="paper-slot filled status-{{ item.status }}" href="/appointments/{{ item.id }}">
+      <div class="slot-name">
+        <span>{{ item.appointment_time.strftime("%H:%M") }}</span>
+        <strong>{{ item.patient.patient_name }}</strong>
+        <em>{{ item.patient.age or "-" }}세</em>
+      </div>
+      <div class="slot-line">
+        <span>No.</span>
+        <strong>{{ item.patient.chart_number }}</strong>
+        <span>{{ item.status }}</span>
+      </div>
+      <div class="scope-row">
+        <span class="{{ 'on' if item.endoscopy_type == '위내시경' else '' }}">위</span>
+        <span class="{{ 'on' if item.endoscopy_type in ['대장내시경', '위·대장 동시 검사'] else '' }}">대장</span>
+        <span class="{{ 'on' if item.sedation else '' }}">수면</span>
+        <span class="{{ 'on' if item.medication_check_required else '' }}">약제</span>
+      </div>
+      <div class="check-row">
+        <span>준비 {{ item.preparation_status }}</span>
+        <span>정결 {{ item.bowel_prep_type or "-" }}</span>
+        <span>보호자 {{ "O" if item.guardian_notice else "-" }}</span>
+      </div>
+      <div class="sono-row">
+        <span>Sono.</span>
+        <strong>{{ ultrasound_labels(item)|join(", ") if ultrasound_labels(item) else "-" }}</strong>
+      </div>
+      <div class="memo-line">{{ item.notes or "" }}</div>
+    </a>
+  {% else %}
+    <div class="paper-slot empty-slot">
+      <div class="slot-name muted">
+        <span>{{ slot_index }}번</span>
+        <strong>예약 없음</strong>
+      </div>
+      {% if slot_date %}
+        <a class="button small" href="/appointments/new?selected_date={{ slot_date }}">이 칸에 등록</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endmacro %}
