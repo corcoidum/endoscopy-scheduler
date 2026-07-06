@@ -97,6 +97,46 @@ h2 { font-size: 22px; margin: 0 0 12px; }
 }
 .summary-grid strong { display: block; font-size: 30px; }
 .summary-grid span { color: var(--muted); }
+.risk-panel {
+  border-color: #f1b45b;
+  background: #fffaf0;
+}
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 12px;
+}
+.risk-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid #f1d39b;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fffdf7;
+}
+.risk-card strong {
+  font-size: 28px;
+  color: var(--warning);
+}
+.risk-card span {
+  color: var(--muted);
+  font-weight: 800;
+}
+.risk-card a {
+  display: block;
+  border-top: 1px solid #f3e4c8;
+  padding-top: 8px;
+  text-decoration: none;
+  font-weight: 700;
+}
+.risk-card a:hover {
+  color: var(--primary-dark);
+}
+.risk-card em {
+  color: var(--muted);
+  font-style: normal;
+}
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -450,6 +490,7 @@ pre {
 @media (max-width: 900px) {
   .topbar { align-items: flex-start; flex-direction: column; }
   .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .risk-grid { grid-template-columns: 1fr; }
   .form-grid, .detail-grid, .week-grid { grid-template-columns: 1fr; }
   .paper-week-head, .paper-week-row { min-width: 980px; }
   .paper-day-slots { grid-template-columns: 1fr; }

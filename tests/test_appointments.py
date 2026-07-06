@@ -1,8 +1,8 @@
-from datetime import date
+from datetime import date, timedelta
 
 from sqlalchemy import select
 
-from app.models import AuditLog, EndoscopyAppointment, Holiday, ScheduleCapacity
+from app.models import AppointmentStatus, AuditLog, EndoscopyAppointment, Holiday, ScheduleCapacity
 from tests.conftest import login
 
 
@@ -155,7 +155,8 @@ def test_today_dashboard_shows_preparation_bowel_prep_and_status_action(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.text.index("09:00") < response.text.index("09:30")
+    today_list = response.text.split("오늘 검사 목록", maxsplit=1)[1]
+    assert today_list.index("09:00") < today_list.index("09:30")
     assert "오늘 검사 목록" in response.text
     assert "대장내시경" in response.text
     assert "미안내" in response.text
@@ -163,3 +164,45 @@ def test_today_dashboard_shows_preparation_bowel_prep_and_status_action(client):
     assert "약제" in response.text
     assert "보호자" in response.text
     assert "advance-status" in response.text
+
+
+def test_today_dashboard_risk_panel_groups_missing_items(client, db_session):
+    login(client, "staff")
+    today = date.today()
+    assert create_appointment(
+        client,
+        chart_number="C20260031",
+        patient_name="준비위험",
+        appointment_date=(today + timedelta(days=2)).isoformat(),
+        appointment_time="09:00",
+        preparation_status="미안내",
+    ).status_code == 303
+    assert create_appointment(
+        client,
+        chart_number="C20260032",
+        patient_name="약제위험",
+        appointment_date=(today + timedelta(days=4)).isoformat(),
+        appointment_time="09:00",
+        medication_check_required="on",
+    ).status_code == 303
+    assert create_appointment(
+        client,
+        chart_number="C20260033",
+        patient_name="노쇼위험",
+        appointment_date=today.isoformat(),
+        appointment_time="09:30",
+    ).status_code == 303
+    no_show = db_session.scalar(select(EndoscopyAppointment).where(EndoscopyAppointment.patient.has(chart_number="C20260033")))
+    no_show.status = AppointmentStatus.no_show.value
+    db_session.commit()
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "누락 리스크" in response.text
+    assert "준비 안내 미발송 + 임박" in response.text
+    assert "약제 확인 필요" in response.text
+    assert "노쇼 후 미조치" in response.text
+    assert "준비위험" in response.text
+    assert "약제위험" in response.text
+    assert "노쇼위험" in response.text

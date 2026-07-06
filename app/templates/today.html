@@ -8,6 +8,42 @@
   <a class="button primary" href="/appointments/new">예약 등록</a>
 </section>
 
+<section class="risk-panel panel">
+  <div class="section-heading">
+    <h2>누락 리스크</h2>
+    <span>D-3 준비 · 약제 확인 · 노쇼 후속</span>
+  </div>
+  <div class="risk-grid">
+    <div class="risk-card">
+      <strong>{{ risks.prep_missing|length }}</strong>
+      <span>준비 안내 미발송 + 임박</span>
+      {% for item in risks.prep_missing %}
+        <a href="/appointments/{{ item.id }}">{{ item.appointment_date }} {{ item.appointment_time.strftime("%H:%M") }} · {{ item.patient.patient_name }} · {{ exam_summary(item) }}</a>
+      {% else %}
+        <em>확인할 건이 없습니다.</em>
+      {% endfor %}
+    </div>
+    <div class="risk-card">
+      <strong>{{ risks.medication_unresolved|length }}</strong>
+      <span>약제 확인 필요</span>
+      {% for item in risks.medication_unresolved %}
+        <a href="/appointments/{{ item.id }}">{{ item.appointment_date }} {{ item.appointment_time.strftime("%H:%M") }} · {{ item.patient.patient_name }} · {{ exam_summary(item) }}</a>
+      {% else %}
+        <em>확인할 건이 없습니다.</em>
+      {% endfor %}
+    </div>
+    <div class="risk-card">
+      <strong>{{ risks.no_show_unhandled|length }}</strong>
+      <span>노쇼 후 미조치</span>
+      {% for item in risks.no_show_unhandled %}
+        <a href="/appointments/{{ item.id }}">{{ item.appointment_date }} {{ item.appointment_time.strftime("%H:%M") }} · {{ item.patient.patient_name }} · {{ exam_summary(item) }}</a>
+      {% else %}
+        <em>확인할 건이 없습니다.</em>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
 <section class="summary-grid">
   <div><strong>{{ counts.total }}</strong><span>전체</span></div>
   <div><strong>{{ counts.gastroscopy }}</strong><span>위</span></div>

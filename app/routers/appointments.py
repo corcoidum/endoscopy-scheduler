@@ -221,9 +221,52 @@ def today(
         "cancelled_or_no_show": sum(1 for item in appointments if item.status in [AppointmentStatus.cancelled.value, AppointmentStatus.no_show.value]),
         "completed": sum(1 for item in appointments if item.status == AppointmentStatus.completed.value),
     }
+    risk_end_date = today_date + timedelta(days=3)
+    risk_candidates = db.scalars(
+        select(EndoscopyAppointment)
+        .options(joinedload(EndoscopyAppointment.patient))
+        .where(
+            or_(
+                and_(
+                    EndoscopyAppointment.appointment_date >= today_date,
+                    EndoscopyAppointment.appointment_date <= risk_end_date,
+                    EndoscopyAppointment.status.in_(ACTIVE_STATUSES),
+                ),
+                and_(
+                    EndoscopyAppointment.appointment_date >= today_date,
+                    EndoscopyAppointment.medication_check_required.is_(True),
+                    EndoscopyAppointment.status.in_(ACTIVE_STATUSES),
+                ),
+                EndoscopyAppointment.status == AppointmentStatus.no_show.value,
+            )
+        )
+        .order_by(EndoscopyAppointment.appointment_date, EndoscopyAppointment.appointment_time)
+    ).all()
+    risks = {
+        "prep_missing": [
+            item
+            for item in risk_candidates
+            if today_date <= item.appointment_date <= risk_end_date
+            and item.status in ACTIVE_STATUSES
+            and item.preparation_status == PreparationStatus.not_done.value
+        ],
+        "medication_unresolved": [
+            item
+            for item in risk_candidates
+            if item.appointment_date >= today_date and item.status in ACTIVE_STATUSES and item.medication_check_required
+        ],
+        "no_show_unhandled": [
+            item
+            for item in risk_candidates
+            if item.status == AppointmentStatus.no_show.value and not (item.notes or "").strip()
+        ],
+    }
     write_audit_log(db, request=request, user=user, action="view_today", target_type="appointment", target_id=None)
     db.commit()
-    return templates.TemplateResponse("today.html", template_context(request, user, appointments=appointments, counts=counts, today=today_date))
+    return templates.TemplateResponse(
+        "today.html",
+        template_context(request, user, appointments=appointments, counts=counts, risks=risks, today=today_date),
+    )
 
 
 @router.get("/appointments/new", response_class=HTMLResponse)
