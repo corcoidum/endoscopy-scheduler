@@ -132,10 +132,12 @@ def test_month_calendar_shows_counts_holiday_and_capacity_warning(client, db_ses
 
 def test_today_dashboard_shows_preparation_bowel_prep_and_status_action(client):
     login(client, "staff")
+    today = date.today().isoformat()
     assert create_appointment(
         client,
         chart_number="C20260021",
         patient_name="오늘가상B",
+        appointment_date=today,
         appointment_time="09:30",
         endoscopy_type="대장내시경",
         preparation_status="미안내",
@@ -147,6 +149,7 @@ def test_today_dashboard_shows_preparation_bowel_prep_and_status_action(client):
         client,
         chart_number="C20260020",
         patient_name="오늘가상A",
+        appointment_date=today,
         appointment_time="09:00",
         endoscopy_type="위내시경",
         preparation_status="안내 완료",

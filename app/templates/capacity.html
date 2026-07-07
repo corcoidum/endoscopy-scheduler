@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="page-title"><h1>검사 시간 및 정원 설정</h1></section>
+<section class="page-title">
+  <h1>검사 시간 및 정원 설정</h1>
+  <a class="button secondary" href="/admin/capacity/import">근무표 CSV 반영</a>
+</section>
 <form method="post" class="panel form-grid">
   <label>요일
     <select name="weekday">
@@ -25,4 +28,3 @@
   </table>
 </section>
 {% endblock %}
-
