@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.audit import write_audit_log
+from app.config import get_settings
 from app.database import get_db
 from app.models import User
 from app.security import create_session_token, hash_password, verify_password
@@ -61,7 +62,14 @@ def login(
     db.commit()
 
     response = RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-    response.set_cookie("session", create_session_token(user.id), httponly=True, samesite="strict")
+    # 운영에서는 HTTPS 연결에만 세션 쿠키를 보냅니다. 개발은 http://127.0.0.1 이므로 켜지 않습니다.
+    response.set_cookie(
+        "session",
+        create_session_token(user.id),
+        httponly=True,
+        samesite="strict",
+        secure=get_settings().is_production,
+    )
     return response
 
 
