@@ -15,7 +15,7 @@ from app.security import hash_password
 
 
 def seed_default_capacities(db) -> None:
-    """창녕 소규모 의원의 기본 오전 내시경 운영 시간표를 샘플로 넣습니다."""
+    """소규모 의원의 기본 오전 내시경 운영 시간표를 샘플로 넣습니다."""
 
     if db.scalar(select(ScheduleCapacity).limit(1)):
         return

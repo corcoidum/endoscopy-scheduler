@@ -17,7 +17,7 @@ NON_PRODUCTION_ENVIRONMENTS = {"development", "dev", "local", "test", "testing"}
 class Settings(BaseSettings):
     """환경변수를 한 곳에서 읽어 앱 전체가 같은 설정을 쓰게 합니다."""
 
-    app_name: str = "Changnyeong Endoscopy Scheduler"
+    app_name: str = "Endoscopy Scheduler"
     environment: str = "development"
     database_url: str = "sqlite:///./endoscopy_dev.db"
     secret_key: str = "dev-only-change-me"
